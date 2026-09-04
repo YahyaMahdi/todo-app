@@ -1,13 +1,6 @@
 const API_URL = 'https://todo-app-1-w0o2.onrender.com/api/todos';
 
-const state = {
-  todos: [],
-  search: '',
-  priority: '',
-  category: '',
-  hideCompleted: false,
-  draggedId: null,
-};
+const state = { todos: [], search: '', priority: '', category: '', hideCompleted: false, draggedId: null };
 
 const form = document.getElementById('todo-form');
 const list = document.getElementById('todo-list');
@@ -18,13 +11,11 @@ const themeToggle = document.getElementById('theme-toggle');
 const initTheme = () => {
   const saved = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
-  themeToggle.textContent = saved === 'dark' ? '☀️' : '🌙';
 };
 themeToggle.addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
-  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
 });
 
 // ==== Fetch ====
@@ -64,11 +55,11 @@ const renderStats = () => {
   document.getElementById('stat-pending').textContent = total - done;
   document.getElementById('stat-done').textContent = done;
   document.getElementById('progress-fill').style.width = `${percent}%`;
-  document.getElementById('progress-text').textContent = `${percent}%`;
+  document.getElementById('progress-text').textContent = `${percent}% مكتمل`;
 };
 
 // ==== Render ====
-const priorityLabel = { high: '🔴 عالية', medium: '🟡 متوسطة', low: '🟢 منخفضة' };
+const priorityLabel = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' };
 const isOverdue = (t) => t.dueDate && !t.completed && new Date(t.dueDate) < new Date(new Date().toDateString());
 const escapeHtml = (str = '') => str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 
@@ -80,26 +71,22 @@ const render = () => {
 
   todos.forEach((todo) => {
     const li = document.createElement('li');
-    li.className = `todo-item ${todo.completed ? 'completed' : ''} ${isOverdue(todo) ? 'overdue' : ''}`;
+    li.className = `index-card priority-${todo.priority} ${todo.completed ? 'completed' : ''} ${isOverdue(todo) ? 'overdue' : ''}`;
     li.draggable = true;
     li.dataset.id = todo._id;
 
-    const dueDateHtml = todo.dueDate
-      ? `<span class="badge badge-date ${isOverdue(todo) ? 'late' : ''}">📅 ${new Date(todo.dueDate).toLocaleDateString('ar-EG')}</span>`
-      : '';
-
     li.innerHTML = `
-      <div class="todo-main">
+      <div class="card-main">
         <input type="checkbox" ${todo.completed ? 'checked' : ''} />
-        <div class="todo-content">
-          <div class="todo-title">${escapeHtml(todo.title)}</div>
-          ${todo.description ? `<div class="todo-description">${escapeHtml(todo.description)}</div>` : ''}
-          <div class="todo-meta">
-            <span class="badge badge-${todo.priority}">${priorityLabel[todo.priority]}</span>
-            ${todo.category ? `<span class="badge badge-category">🏷️ ${escapeHtml(todo.category)}</span>` : ''}
-            ${dueDateHtml}
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(todo.title)}</div>
+          ${todo.description ? `<div class="card-desc">${escapeHtml(todo.description)}</div>` : ''}
+          <div class="card-meta">
+            <span>${priorityLabel[todo.priority]}</span>
+            ${todo.category ? `<span>${escapeHtml(todo.category)}</span>` : ''}
+            ${todo.dueDate ? `<span class="badge-date">${new Date(todo.dueDate).toLocaleDateString('ar-EG')}</span>` : ''}
           </div>
-          <div class="todo-actions">
+          <div class="card-actions">
             <button class="btn-edit">تعديل</button>
             <button class="btn-delete">حذف</button>
           </div>
@@ -127,13 +114,13 @@ const enterEditMode = (li, todo) => {
       <input type="text" class="edit-title" value="${escapeHtml(todo.title)}" />
       <textarea class="edit-description" rows="2">${escapeHtml(todo.description || '')}</textarea>
       <select class="edit-priority">
-        <option value="low" ${todo.priority === 'low' ? 'selected' : ''}>🟢 منخفضة</option>
-        <option value="medium" ${todo.priority === 'medium' ? 'selected' : ''}>🟡 متوسطة</option>
-        <option value="high" ${todo.priority === 'high' ? 'selected' : ''}>🔴 عالية</option>
+        <option value="low" ${todo.priority === 'low' ? 'selected' : ''}>منخفضة</option>
+        <option value="medium" ${todo.priority === 'medium' ? 'selected' : ''}>متوسطة</option>
+        <option value="high" ${todo.priority === 'high' ? 'selected' : ''}>عالية</option>
       </select>
       <input type="date" class="edit-dueDate" value="${todo.dueDate ? todo.dueDate.slice(0, 10) : ''}" />
       <input type="text" class="edit-category" value="${escapeHtml(todo.category || '')}" />
-      <div class="todo-actions">
+      <div class="edit-actions">
         <button class="btn-save">حفظ</button>
         <button class="btn-cancel">إلغاء</button>
       </div>
@@ -161,12 +148,9 @@ const handleDrop = async (targetId) => {
   const [moved] = state.todos.splice(fromIndex, 1);
   state.todos.splice(toIndex, 0, moved);
   render();
-
   const items = state.todos.map((t, i) => ({ id: t._id, order: i }));
   await fetch(`${API_URL}/reorder`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items }),
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }),
   });
 };
 
@@ -181,24 +165,14 @@ form.addEventListener('submit', async (e) => {
     category: document.getElementById('input-category').value.trim() || 'عام',
   };
   if (!payload.title) return;
-
-  await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
+  await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   form.reset();
   document.getElementById('input-priority').value = 'medium';
   fetchTodos();
 });
 
 const updateTodo = async (id, updates) => {
-  await fetch(`${API_URL}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  });
+  await fetch(`${API_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
   fetchTodos();
 };
 
