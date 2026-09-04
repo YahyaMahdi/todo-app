@@ -20,7 +20,10 @@ themeToggle.addEventListener('click', () => {
 
 // ==== Fetch ====
 const fetchTodos = async () => {
-  const res = await fetch(API_URL);
+  const res = await fetch(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) { localStorage.removeItem('token'); window.location.href = 'login.html'; return; }
   const { data } = await res.json();
   state.todos = data;
   updateCategoryOptions();
@@ -150,7 +153,7 @@ const handleDrop = async (targetId) => {
   render();
   const items = state.todos.map((t, i) => ({ id: t._id, order: i }));
   await fetch(`${API_URL}/reorder`, {
-    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }),
+    method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ items }),
   });
 };
 
@@ -165,19 +168,19 @@ form.addEventListener('submit', async (e) => {
     category: document.getElementById('input-category').value.trim() || 'عام',
   };
   if (!payload.title) return;
-  await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
   form.reset();
   document.getElementById('input-priority').value = 'medium';
   fetchTodos();
 });
 
 const updateTodo = async (id, updates) => {
-  await fetch(`${API_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+  await fetch(`${API_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(updates) });
   fetchTodos();
 };
 
 const deleteTodo = async (id) => {
-  await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+  await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
   fetchTodos();
 };
 
@@ -190,3 +193,13 @@ document.getElementById('filter-hide-completed').addEventListener('change', (e) 
 // ==== Init ====
 initTheme();
 fetchTodos();
+
+
+// ==== حماية الطلبات + تسجيل الخروج ====
+const token = localStorage.getItem('token');
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userName');
+  window.location.href = 'login.html';
+});

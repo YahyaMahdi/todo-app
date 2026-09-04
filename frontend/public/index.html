@@ -9,15 +9,20 @@
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="ledger-app">
+  <script>
+    // حماية الصفحة — لو ما في token، ارجع لصفحة الدخول فورًا
+    if (!localStorage.getItem('token')) window.location.href = 'login.html';
+  </script>
 
-    <header class="masthead">
-      <div class="masthead-title">
-        <span class="masthead-mark">§</span>
-        <h1>دفتر المهام</h1>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1 class="brand-title">مهامي</h1>
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn">◐</button>
+        <button id="logout-btn" class="btn-logout">تسجيل خروج</button>
       </div>
-      <button id="theme-toggle" class="theme-toggle" aria-label="تبديل الوضع الليلي">◐</button>
     </header>
+    <!-- باقي محتوى الصفحة (stats-bar, entry-card, filters, todo-list) يبقى كما هو -->
 
     <div class="layout">
 

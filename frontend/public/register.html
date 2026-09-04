@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>إنشاء حساب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-brand">
+      <h1>دفتر المهام</h1>
+      <p>ابدأ بتنظيم مهامك اليوم. حساب واحد، كل أدواتك بمكان واحد.</p>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <h2>إنشاء حساب</h2>
+        <p class="sub">دقيقة وحدة وخلص 🚀</p>
+        <div id="alert-box"></div>
+        <form id="register-form">
+          <div class="field">
+            <label>الاسم</label>
+            <input type="text" id="reg-name" required />
+          </div>
+          <div class="field">
+            <label>الإيميل</label>
+            <input type="email" id="reg-email" required />
+          </div>
+          <div class="field">
+            <label>كلمة السر (6 أحرف على الأقل)</label>
+            <input type="password" id="reg-password" minlength="6" required />
+          </div>
+          <button type="submit" class="btn-primary" id="register-btn">إنشاء الحساب</button>
+        </form>
+        <p class="auth-alt">عندك حساب أصلًا؟ <a href="login.html">سجل دخول</a></p>
+      </div>
+    </div>
+  </div>
+  <script src="js/auth.js"></script>
+</body>
+</html>
