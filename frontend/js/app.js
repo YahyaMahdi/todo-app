@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/todos';
+const API_URL = 'https://todo-app-1-w0o2.onrender.com/api/todos';
 
 const state = {
   todos: [],
